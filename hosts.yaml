@@ -1,0 +1,10 @@
+target_servers:
+- ip: 1.1.1.1
+  user: vagrant
+  password: vagrant
+- ip: 1.1.1.1
+  user: vagrant
+  password: vagrant
+- ip: 1.1.1.1
+  user: vagrant
+  password: vagrant
