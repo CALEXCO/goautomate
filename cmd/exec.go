@@ -33,8 +33,7 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// execCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	rootCmd.PersistentFlags().String("command", "", "\"ls -l .* | grep bash\"")
-	rootCmd.PersistentFlags().String("servers", "", "\"ls -l .* | grep bash\"")
+	rootCmd.PersistentFlags().String("command", "", "Command to execute to the server/s. Ex: \"ls -l .* | grep bash\"")
 	rootCmd.PersistentFlags().String("file", "", `yaml file with the hosts you want to target with the command.
 For example:
 target_servers:
