@@ -37,10 +37,11 @@ func init() {
 	rootCmd.PersistentFlags().String("file", "", `yaml file with the hosts you want to target with the command.
 For example:
 target_servers:
-	- ip: 1.1.1.1
-	user: vagrant
-	password: vagrant
-	- ip: 1.1.1.1
-	user: vagrant
-	password: vagrant`)
+target_servers:
+- ip: 1.1.1.1
+  user: vagrant
+  password: vagrant
+- ip: 1.1.1.1
+  user: vagrant
+  password: vagrant`)
 }
