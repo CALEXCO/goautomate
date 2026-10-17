@@ -5,8 +5,10 @@ SPDX-License-Identifier: MIT
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/CALEXCO/goautomate/pkg"
 	"github.com/CALEXCO/goautomate/pkg/server"
@@ -28,18 +30,20 @@ var execCmd = &cobra.Command{
 			panic(err)
 		}
 		targetServer := server.BuildServersFromYaml(f)
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
 		var wg sync.WaitGroup
 		for _, ts := range targetServer.Servers {
 			wg.Add(1)
-			go func() {
-				output, err := pkg.ConnectAndExecute(ts.User, ts.Pass, ts.Ip, c)
+			go func(*context.Context) {
+				defer wg.Done()
+				output, err := pkg.ConnectAndExecute(ctx, ts.User, ts.Pass, ts.Ip, c)
 				fmt.Println("Executing:", c, "in", ts.Ip)
 				if err != nil {
 					panic(err)
 				}
 				fmt.Println(output)
-				defer wg.Done()
-			}()
+			}(&ctx)
 		}
 		wg.Wait()
 	},

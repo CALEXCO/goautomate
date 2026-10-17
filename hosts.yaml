@@ -1,4 +1,7 @@
 target_servers:
+- ip: 10.0.16.10
+  user: rocky
+  password: rocky
 - ip: 10.0.16.11
   user: rocky
   password: rocky
@@ -24,14 +27,5 @@ target_servers:
   user: rocky
   password: rocky
 - ip: 10.0.16.19
-  user: rocky
-  password: rocky
-- ip: 10.0.16.20
-  user: rocky
-  password: rocky
-- ip: 10.0.16.21
-  user: rocky
-  password: rocky
-- ip: 10.0.16.22
   user: rocky
   password: rocky
