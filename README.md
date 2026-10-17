@@ -113,7 +113,9 @@ Provide both `--file` and `--command`: the CLI does not currently validate them 
 └── create-vms.sh           # Auxiliary libvirt lab script
 ```
 
-`create-vms.sh` is specific to the development environment: it depends on files in `/tmp/goautomate-rockylab`, existing volumes and images, and a libvirt network named `rockylab`. It does not provision a complete lab on its own and is not required to use the CLI.
+`create-vms.sh` starts existing `rocky1` through `rocky10` domains or creates them if missing. It requires access to `qemu:///system` and an existing persistent `rockylab` network with IPv4 DHCP on `10.0.16.0/24`. It configures DHCP reservations from `10.0.16.10` (`rocky1`) through `10.0.16.19` (`rocky10`), replacing conflicting reservations for these IPs or MAC addresses. Existing guests may need a DHCP lease renewal or restart to receive their new addresses. To create domains, install `virt-install`, `qemu-img` and Python 3, provide a Rocky Linux 9 cloud image as `vms/base.qcow2` or set `BASE_IMAGE=/absolute/path/image.qcow2`, and have a storage pool named `default`. Cloud-init files are generated in `vms/`, with SSH credentials `rocky` / `rocky` for newly created machines. Existing disks are never overwritten. `hosts.yaml` contains these ten addresses.
+
+Run `./create-vms.sh` to create or start the lab. Run `./destroy-vms.sh` to force-stop and delete all ten domains and their `default/rockyN.qcow2` disks, including their data. The base image and network reservations are retained for reuse. These scripts are not required to use the CLI.
 
 ## Development
 
