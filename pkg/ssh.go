@@ -1,8 +1,10 @@
 package pkg
 
-import "golang.org/x/crypto/ssh"
+import (
+	"golang.org/x/crypto/ssh"
+)
 
-func connectToServer(user, password, host string) (*ssh.Client, error) {
+func ConnectToServer(user, password, host string) (*ssh.Client, error) {
 	config := &ssh.ClientConfig{
 		User: user,
 		Auth: []ssh.AuthMethod{
@@ -18,7 +20,7 @@ func connectToServer(user, password, host string) (*ssh.Client, error) {
 	return client, nil
 }
 
-func executeCommand(client *ssh.Client, command string) (string, error) {
+func ExecuteCommand(client *ssh.Client, command string) (string, error) {
 	session, err := client.NewSession()
 	if err != nil {
 		return "", err
@@ -29,7 +31,14 @@ func executeCommand(client *ssh.Client, command string) (string, error) {
 	return string(output), err
 }
 
-// TODO: Create finction for Connect and Execute to a list of servers (sequencial)
-func ConnectAndExecuteCommand(client *ssh.Client, command string) {
-	panic("TODO: Not implemented")
+func ConnectAndExecute(user, pass, host, command string) (string, error) {
+	sc, err := ConnectToServer(user, pass, host)
+	if err != nil {
+		panic(err)
+	}
+	output, err := ExecuteCommand(sc, command)
+	if err != nil {
+		return "", err
+	}
+	return output, nil
 }

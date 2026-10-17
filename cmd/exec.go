@@ -5,7 +5,10 @@ package cmd
 
 import (
 	"fmt"
+	"sync"
 
+	"github.com/CALEXCO/goautomate/pkg"
+	"github.com/CALEXCO/goautomate/pkg/server"
 	"github.com/spf13/cobra"
 )
 
@@ -15,7 +18,29 @@ var execCmd = &cobra.Command{
 	Short: "exec command to target server",
 	Long:  `execute a command to a target group of servers`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Executing")
+		f, err := cmd.Flags().GetString("file")
+		if err != nil {
+			panic(err)
+		}
+		c, err := cmd.Flags().GetString("command")
+		if err != nil {
+			panic(err)
+		}
+		targetServer := server.BuildServersFromYaml(f)
+		var wg sync.WaitGroup
+		for _, ts := range targetServer.Servers {
+			wg.Add(1)
+			go func() {
+				output, err := pkg.ConnectAndExecute(ts.User, ts.Pass, ts.Ip, c)
+				fmt.Println("Executing:", c, "in", ts.Ip)
+				if err != nil {
+					panic(err)
+				}
+				fmt.Println(output)
+				defer wg.Done()
+			}()
+		}
+		wg.Wait()
 	},
 }
 
