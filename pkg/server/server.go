@@ -5,13 +5,14 @@ import (
 
 	"github.com/CALEXCO/goautomate/pkg"
 	"github.com/goccy/go-yaml"
+	"golang.org/x/crypto/ssh"
 )
 
 type Server struct {
 	Ip        string `yaml:"ip"`
 	User      string `yaml:"user"`
 	Pass      string `yaml:"password"`
-	sshConfig pkg.SshConfig
+	SshConfig pkg.SshConfig
 }
 
 type TagetServers struct {
@@ -23,7 +24,7 @@ func NewServer(ip, user, password string) Server {
 		Ip:        ip,
 		User:      user,
 		Pass:      password,
-		sshConfig: pkg.NewSshConfig(user, password, ip),
+		SshConfig: pkg.NewSshConfig(user, password, ip),
 	}
 }
 
@@ -44,4 +45,24 @@ func BuildServersFromYaml(hostFile string) TagetServers {
 		panic(err)
 	}
 	return ts
+}
+
+func (s Server) ConnectToServer() (*ssh.Client, error) {
+	client, err := ssh.Dial("tcp", s.SshConfig.TargetHost, &s.SshConfig.Config)
+	if err != nil {
+		return nil, err
+	}
+	return client, nil
+}
+
+func (s Server) ConnectAndExecute(command string) (string, error) {
+	sc, err := s.ConnectToServer()
+	if err != nil {
+		panic(err)
+	}
+	output, err := s.SshConfig.ExecuteCommand(sc, command)
+	if err != nil {
+		return "", err
+	}
+	return output, nil
 }
