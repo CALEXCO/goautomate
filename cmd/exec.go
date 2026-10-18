@@ -10,7 +10,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/CALEXCO/goautomate/pkg"
 	"github.com/CALEXCO/goautomate/pkg/server"
 	"github.com/spf13/cobra"
 )
@@ -30,14 +29,16 @@ var execCmd = &cobra.Command{
 			panic(err)
 		}
 		targetServer := server.BuildServersFromYaml(f)
-		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-		defer cancel()
+
 		var wg sync.WaitGroup
 		for _, ts := range targetServer.Servers {
+			ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+			defer cancel()
+			ts.SshConfig.Ctx = ctx
 			wg.Add(1)
 			go func(*context.Context) {
 				defer wg.Done()
-				output, err := pkg.ConnectAndExecute(ctx, ts.User, ts.Pass, ts.Ip, c)
+				output, err := ts.ConnectAndExecute(c)
 				fmt.Println("Executing:", c, "in", ts.Ip)
 				if err != nil {
 					panic(err)
