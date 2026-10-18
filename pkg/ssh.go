@@ -30,15 +30,6 @@ func NewSshConfig(user, password, host string) SshConfig {
 	}
 }
 
-func (sc SshConfig) ConnectToServer() (*ssh.Client, error) {
-
-	client, err := ssh.Dial("tcp", sc.TargetHost, &sc.Config)
-	if err != nil {
-		return nil, err
-	}
-	return client, nil
-}
-
 func (sc SshConfig) ExecuteCommand(client *ssh.Client, command string) (string, error) {
 	session, err := client.NewSession()
 	if err != nil {
