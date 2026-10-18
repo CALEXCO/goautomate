@@ -3,13 +3,15 @@ package server
 import (
 	"os"
 
+	"github.com/CALEXCO/goautomate/pkg"
 	"github.com/goccy/go-yaml"
 )
 
 type Server struct {
-	Ip   string `yaml:"ip"`
-	User string `yaml:"user"`
-	Pass string `yaml:"password"`
+	Ip        string `yaml:"ip"`
+	User      string `yaml:"user"`
+	Pass      string `yaml:"password"`
+	sshConfig pkg.SshConfig
 }
 
 type TagetServers struct {
@@ -18,9 +20,10 @@ type TagetServers struct {
 
 func NewServer(ip, user, password string) Server {
 	return Server{
-		Ip:   ip,
-		User: user,
-		Pass: password,
+		Ip:        ip,
+		User:      user,
+		Pass:      password,
+		sshConfig: pkg.NewSshConfig(user, password, ip),
 	}
 }
 

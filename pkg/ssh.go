@@ -7,17 +7,31 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-func ConnectToServer(user, password, host string) (*ssh.Client, error) {
-	config := &ssh.ClientConfig{
-		User: user,
-		Auth: []ssh.AuthMethod{
-			ssh.Password(password),
-		},
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
-		Timeout:         200 * time.Millisecond,
-	}
+type SshConfig struct {
+	config ssh.ClientConfig
+	ctx    context.Context
+}
 
-	client, err := ssh.Dial("tcp", host+":22", config)
+//TODO: Wrap the ssh cinfiguration and everything into a struct to have better organization
+
+func NewSshConfig(user, password, host string) SshConfig {
+	return SshConfig{
+		config: ssh.ClientConfig{
+			User: user,
+			Auth: []ssh.AuthMethod{
+				ssh.Password(password),
+			},
+			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+			Timeout:         200 * time.Millisecond,
+		},
+		ctx: context.Background(),
+	}
+}
+
+func ConnectToServer(user, password, host string) (*ssh.Client, error) {
+	config := NewSshConfig(user, password, host)
+
+	client, err := ssh.Dial("tcp", host+":22", &config.config)
 	if err != nil {
 		return nil, err
 	}
