@@ -32,14 +32,14 @@ var execCmd = &cobra.Command{
 
 		var wg sync.WaitGroup
 		for _, ts := range targetServer.Servers {
-			ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 			defer cancel()
 			ts.SshConfig.Ctx = ctx
 			wg.Add(1)
 			go func(*context.Context) {
 				defer wg.Done()
-				output, err := ts.ConnectAndExecute(c)
 				fmt.Println("Executing:", c, "in", ts.Ip)
+				output, err := ts.ConnectAndExecute(c)
 				if err != nil {
 					panic(err)
 				}

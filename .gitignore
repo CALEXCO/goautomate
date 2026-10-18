@@ -1,3 +1,4 @@
 goautomate
 .vagrant/
 vms/
+.vscode/

@@ -19,21 +19,6 @@ type TagetServers struct {
 	Servers []Server `yaml:"target_servers"`
 }
 
-func NewServer(ip, user, password string) Server {
-	return Server{
-		Ip:        ip,
-		User:      user,
-		Pass:      password,
-		SshConfig: pkg.NewSshConfig(user, password, ip),
-	}
-}
-
-func NewTargetServers() TagetServers {
-	return TagetServers{
-		Servers: make([]Server, 0),
-	}
-}
-
 func BuildServersFromYaml(hostFile string) TagetServers {
 	var ts TagetServers
 	s, err := os.ReadFile(hostFile)
@@ -44,10 +29,14 @@ func BuildServersFromYaml(hostFile string) TagetServers {
 	if err != nil {
 		panic(err)
 	}
+	for i := range ts.Servers {
+		s := &ts.Servers[i]
+		s.SshConfig = pkg.NewSshConfig(s.User, s.Pass, s.Ip)
+	}
 	return ts
 }
 
-func (s Server) ConnectToServer() (*ssh.Client, error) {
+func (s *Server) ConnectToServer() (*ssh.Client, error) {
 	client, err := ssh.Dial("tcp", s.SshConfig.TargetHost, &s.SshConfig.Config)
 	if err != nil {
 		return nil, err
@@ -55,7 +44,7 @@ func (s Server) ConnectToServer() (*ssh.Client, error) {
 	return client, nil
 }
 
-func (s Server) ConnectAndExecute(command string) (string, error) {
+func (s *Server) ConnectAndExecute(command string) (string, error) {
 	sc, err := s.ConnectToServer()
 	if err != nil {
 		panic(err)
