@@ -26,7 +26,7 @@ func NewSshConfig(user, password, host string) SshConfig {
 			Timeout:         200 * time.Millisecond,
 		},
 		Ctx:        nil,
-		TargetHost: host + "22",
+		TargetHost: host + ":22",
 	}
 }
 
