@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/CALEXCO/goautomate/pkg"
@@ -27,7 +28,8 @@ func BuildServersFromYaml(hostFile string) TagetServers {
 	}
 	err = yaml.Unmarshal(s, &ts)
 	if err != nil {
-		panic(err)
+		fmt.Fprintln(os.Stderr, "ERROR: Could not unmarshal from yaml", err)
+		os.Exit(1)
 	}
 	for i := range ts.Servers {
 		s := &ts.Servers[i]
