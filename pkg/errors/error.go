@@ -6,6 +6,8 @@ import "fmt"
 const (
 	ConnectionFailure = iota * 125
 	CommandTimeout
+	UnmarshalingFailure
+	ReadingFileFailure
 )
 
 type GoAutomateErrors struct {

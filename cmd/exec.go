@@ -31,7 +31,12 @@ var execCmd = &cobra.Command{
 		if err != nil {
 			panic(err)
 		}
-		targetServer := server.BuildServersFromYaml(f)
+		targetServer, err := server.BuildServersFromYaml(f)
+		if err != nil {
+			if gae, ok := errors.AsType[*customErr.GoAutomateErrors](err); ok {
+				os.Exit(gae.Code)
+			}
+		}
 
 		var wg sync.WaitGroup
 		for _, ts := range targetServer.Servers {

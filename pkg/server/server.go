@@ -21,28 +21,28 @@ type TagetServers struct {
 	Servers []Server `yaml:"target_servers"`
 }
 
-func BuildServersFromYaml(hostFile string) TagetServers {
+func BuildServersFromYaml(hostFile string) (TagetServers, error) {
 	var ts TagetServers
 	s, err := os.ReadFile(hostFile)
 	if err != nil {
-		panic(err)
+		return TagetServers{}, &errors.GoAutomateErrors{Code: errors.ReadingFileFailure, Msg: "ERROR: Could not read file"}
 	}
 	err = yaml.Unmarshal(s, &ts)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "ERROR: Could not unmarshal from yaml", err)
-		os.Exit(1)
+		return TagetServers{}, &errors.GoAutomateErrors{Code: errors.UnmarshalingFailure, Msg: "ERROR: Could not unmarshal"}
 	}
 	for i := range ts.Servers {
 		s := &ts.Servers[i]
 		s.SshConfig = pkg.NewSshConfig(s.User, s.Pass, s.Ip)
 	}
-	return ts
+	return ts, nil
 }
 
 func (s *Server) ConnectToServer() (*ssh.Client, error) {
 	client, err := ssh.Dial("tcp", s.SshConfig.TargetHost, &s.SshConfig.Config)
 	if err != nil {
-		return nil, err
+		return nil, &errors.GoAutomateErrors{Code: errors.ConnectionFailure, Msg: "Error: Connection failure"}
 	}
 	return client, nil
 }
