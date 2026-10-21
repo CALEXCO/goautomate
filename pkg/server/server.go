@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/CALEXCO/goautomate/pkg"
+	"github.com/CALEXCO/goautomate/pkg/errors"
 	"github.com/goccy/go-yaml"
 	"golang.org/x/crypto/ssh"
 )
@@ -49,11 +50,11 @@ func (s *Server) ConnectToServer() (*ssh.Client, error) {
 func (s *Server) ConnectAndExecute(command string) (string, error) {
 	sc, err := s.ConnectToServer()
 	if err != nil {
-		panic(err)
+		return "", &errors.GoAutomateErrors{Code: errors.ConnectionFailure, Msg: "Error: Connection failure"}
 	}
 	output, err := s.SshConfig.ExecuteCommand(sc, command)
 	if err != nil {
-		return "", err
+		return "", &errors.GoAutomateErrors{Code: errors.CommandTimeout, Msg: "Error: Command did not finished correctly"}
 	}
 	return output, nil
 }

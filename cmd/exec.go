@@ -6,10 +6,13 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"os"
 	"sync"
 	"time"
 
+	customErr "github.com/CALEXCO/goautomate/pkg/errors"
 	"github.com/CALEXCO/goautomate/pkg/server"
 	"github.com/spf13/cobra"
 )
@@ -41,7 +44,10 @@ var execCmd = &cobra.Command{
 				fmt.Println("Executing:", c, "in", ts.Ip)
 				output, err := ts.ConnectAndExecute(c)
 				if err != nil {
-					panic(err)
+					fmt.Fprintln(os.Stderr, err)
+					if gae, ok := errors.AsType[*customErr.GoAutomateErrors](err); ok {
+						os.Exit(gae.Code)
+					}
 				}
 				fmt.Println(output)
 			}(&ctx)
@@ -50,20 +56,9 @@ var execCmd = &cobra.Command{
 	},
 }
 
-// TODO: execute command in a server using ssh
-
 func init() {
 	rootCmd.AddCommand(execCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// execCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// execCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	rootCmd.PersistentFlags().String("command", "", "Command to execute to the server/s. Ex: \"ls -l .* | grep bash\"")
 	rootCmd.PersistentFlags().String("file", "", `yaml file with the hosts you want to target with the command.
 For example:
