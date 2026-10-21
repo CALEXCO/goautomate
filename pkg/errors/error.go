@@ -4,7 +4,7 @@ import "fmt"
 
 // TODO: Define errors codes and use exit to finish the program
 const (
-	ConnectionFailure = iota * 125
+	ConnectionFailure = (iota + 1) * 125
 	CommandTimeout
 	UnmarshalingFailure
 	ReadingFileFailure
